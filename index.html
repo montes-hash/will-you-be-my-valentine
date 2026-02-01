@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Be My Valentine ❤️</title>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #2b1055, #000);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+/* Floating hearts */
+.heart {
+  position: fixed;
+  bottom: -20px;
+  color: rgba(255, 77, 109, 0.6);
+  font-size: 18px;
+  animation: float 6s linear infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-110vh); opacity: 0; }
+}
+
+.container {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  width: 92%;
+  max-width: 360px;
+  padding: 25px;
+  border-radius: 22px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+h1, h2 {
+  color: #ff4d6d;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  margin: 12px 0;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.yes {
+  background: linear-gradient(135deg, #ff4d6d, #ff758f);
+  color: white;
+}
+
+.option {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+.no {
+  background: #999;
+  position: absolute;
+  padding: 12px 18px;
+  border-radius: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" loop>
+  <source src="iris-violin.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container" id="app"></div>
+
+<script>
+emailjs.init("YOUR_PUBLIC_KEY"); // 🔴 replace
+
+const app = document.getElementById("app");
+const music = document.getElementById("bgMusic");
+let data = {};
+const yourName = "Mic"; // ❤️ CHANGE THIS TO YOUR NAME
+
+/* Floating hearts generator */
+setInterval(() => {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.innerHTML = "❤️";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = Math.random() * 12 + 12 + "px";
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 6000);
+}, 600);
+
+/* Fade-in music */
+function startMusic() {
+  music.volume = 0;
+  music.play();
+  let vol = 0;
+  const fade = setInterval(() => {
+    if (vol < 0.6) {
+      vol += 0.02;
+      music.volume = vol;
+    } else {
+      clearInterval(fade);
+    }
+  }, 150);
+}
+
+/* Pages */
+function pageName() {
+  app.innerHTML = `
+    <h1>Hello ❤️</h1>
+    <input id="name" placeholder="Enter your name" />
+    <button class="yes" onclick="saveName()">Next</button>
+  `;
+}
+
+function saveName() {
+  data.name = document.getElementById("name").value;
+  startMusic();
+  pageValentine();
+}
+
+function pageValentine() {
+  app.innerHTML = `
+    <h2>Will you be my Valentine?</h2>
+    <button class="yes" onclick="yesClicked()">Yes 💖</button>
+    <button class="no" id="noBtn">No 💔</button>
+  `;
+
+  const noBtn = document.getElementById("noBtn");
+  const move = () => {
+    noBtn.style.left = Math.random() * 75 + "vw";
+    noBtn.style.top = Math.random() * 75 + "vh";
+  };
+  noBtn.addEventListener("mouseover", move);
+  noBtn.addEventListener("touchstart", move);
+}
+
+function yesClicked() {
+  if (navigator.vibrate) navigator.vibrate(120);
+  pageChoices();
+}
+
+function pageChoices() {
+  app.innerHTML = `
+    <h2>What do you want to do?</h2>
+    <button class="option" onclick="eat()">Eat 🍽️</button>
+    <button class="option" onclick="activities()">Activities 🎮</button>
+    <button class="option" onclick="cinema()">Cinema 🎬</button>
+  `;
+}
+
+function eat() {
+  data.activity = "Eat";
+  app.innerHTML = `
+    <h2>Choose one 🍽️</h2>
+    <button class="option" onclick="finish('Yakiniku! Like 🥩')">Yakiniku! Like 🥩</button>
+    <button class="option" onclick="finish('Din Tai Fung 🥟')">Din Tai Fung 🥟</button>
+    <button class="option" onclick="finish('Panda Express 🥡')">Panda Express 🥡</button>
+  `;
+}
+
+function activities() {
+  data.activity = "Activities";
+  app.innerHTML = `
+    <h2>Choose one 🎮</h2>
+    <button class="option" onclick="finish('Timezone 🕹️')">Timezone 🕹️</button>
+    <button class="option" onclick="finish('Billiards 🎱')">Billiards 🎱</button>
+  `;
+}
+
+function cinema() {
+  data.activity = "Cinema";
+  app.innerHTML = `
+    <h2>What movie do you want to watch?</h2>
+    <input id="movie" placeholder="Movie title 🎬" />
+    <button class="yes" onclick="saveMovie()">Next</button>
+  `;
+}
+
+function saveMovie() {
+  data.choice = document.getElementById("movie").value;
+  emailPage();
+}
+
+function finish(choice) {
+  data.choice = choice;
+  emailPage();
+}
+
+function emailPage() {
+  app.innerHTML = `
+    <h2>Almost done 💌</h2>
+    <input id="email" placeholder="Enter your email" />
+    <button class="yes" onclick="sendEmail()">Submit</button>
+  `;
+}
+
+function sendEmail() {
+  data.email = document.getElementById("email").value;
+
+  emailjs.send(service_fmeiahi, template_wsjic2i, {
+    name: data.name,
+    activity: data.activity,
+    choice: data.choice,
+    email: data.email
+  });
+
+  app.innerHTML = `
+    <h2>Thank you ❤️</h2>
+    <p>
+      Thank you for choosing to spend Valentine’s Day with me.<br><br>
+      <strong>I love you so much 💖</strong><br><br>
+      — ${yourName}
+    </p>
+  `;
+}
+
+pageName();
+</script>
+
+</body>
+</html>
